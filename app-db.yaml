@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo
+          volumeMounts:
+            - mountPath: /data/db
+              name: app-db-data
+          ports:
+            - name: mongodb-port
+              containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: password
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "root"
+      nodeSelector:
+        zone: ap-south-1a
+      volumes:
+        - name: app-db-data
+          awsElasticBlockStore:
+            volumeID: vol-007d70e4b735e4e99
+            fsType: ext4
+      initContainers:
+        - name: busybox
+          image: busybox:latest
+          args: ["rm", "-rf", "/data/db/lost+found"]
+          volumeMounts:
+            - name: app-db-data
+              mountPath: /data/db
