@@ -35,7 +35,7 @@ spec:
               value: "mongodb"
             - name: USERNAME
               value: "root"
-      initContainers:
-        - name: busybox
-          image: busybox:latest
-          command: ['sh', '-c', 'until nslookup mongodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
+      # initContainers:
+      #   - name: busybox
+      #     image: busybox:latest
+      #     command: ['sh', '-c', 'until nslookup mongodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
