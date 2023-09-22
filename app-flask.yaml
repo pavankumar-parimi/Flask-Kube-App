@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskapp
+  labels:
+    app: flaskapp
+spec:
+  selector:
+    matchLabels:
+      app: flaskapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flaskapp
+    spec:
+      containers:
+        - name: flaskapp
+          image: pavankumarparimi/flaskapplication
+          ports:
+            - name: app-port
+              containerPort: 4000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: secret-key
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: password
+            - name: MONGODB_HOSTNAME
+              value: "mongodb"
+            - name: USERNAME
+              value: "root"
+      initContainers:
+        - name: busybox
+          image: busybox:latest
+          command: ['sh', '-c', 'until nslookup mongodb; do echo waiting for mydb; sleep 2; done;']
